@@ -21,10 +21,14 @@ class Player {
 
     var maxHP:Int
     var damage:Int
+    var currentHP:Int
 
     var maxX=0
     var maxY=0
     var isWalking = false
+    var isDead = false
+    //var lastShootTime = System.currentTimeMillis()
+    //val shootInterval = 1000L
 
     lateinit var detectCollision : Rect
     var rotationAngle = 0f
@@ -32,6 +36,7 @@ class Player {
         x=70f
         y=50f
         maxHP=100
+        currentHP=maxHP
         damage=10
         bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.cowboy)
         joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
@@ -62,6 +67,9 @@ class Player {
             y = y.coerceIn(0f, maxY.toFloat())
             rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
         }
+        if(currentHP<=0){
+            isDead=true
+        }
 
             detectCollision.left = x.toInt()
             detectCollision.top = y.toInt()
@@ -76,6 +84,13 @@ class Player {
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
+    fun getPlayerDirection(): Pair<Float, Float> {
+        val radians = Math.toRadians(rotationAngle.toDouble())
+        val directionX = cos(radians).toFloat()
+        val directionY = sin(radians).toFloat()
+        return Pair(directionX, directionY)
+    }
+
 
 
 }

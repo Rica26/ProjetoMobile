@@ -17,16 +17,25 @@ class Enemy {
     var x=0f
     var y=0f
     var speed=0
+    var maxHP:Int
+    var currentHP:Int
     var maxX=0
     var maxY=0
     val generator=Random()
     lateinit var detectCollision:Rect
+    var isDead=false
+    var damage:Int
     var rotationAngle=0f
+    var directionX=0f
+    var directionY=0f
 
     constructor(context:Context,width:Int,height:Int){
         maxX=width
         maxY=height
         speed=5
+        damage=5
+        maxHP=50
+        currentHP=maxHP
 
         bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.zombie)
         x = (generator.nextInt(maxX - bitmap.width) ).toFloat()
@@ -45,8 +54,8 @@ class Enemy {
         val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
         // Normaliza o vetor de direção para suavizar o movimento
-        val directionX = if (distance > 0) deltaX / distance else 0f
-        val directionY = if (distance > 0) deltaY / distance else 0f
+        directionX = if (distance > 0) deltaX / distance else 0f
+        directionY = if (distance > 0) deltaY / distance else 0f
 
         // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
         x += directionX * speed
@@ -56,6 +65,10 @@ class Enemy {
         x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
         y = y.coerceIn(0f, maxY.toFloat() - bitmap.height)
         rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
+
+        if(currentHP<=0){
+            isDead=true
+        }
 
 
         // Atualiza o objeto de detecção de colisão

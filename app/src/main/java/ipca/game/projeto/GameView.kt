@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Rect
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -22,6 +25,7 @@ class GameView:SurfaceView,Runnable {
     var player:Player
     var enemies= arrayListOf<Enemy>()
     var joystick:Joystick
+    var projectile= arrayListOf<Projectile>()
     val backgroundImage: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
     constructor(context: Context,width:Int,height:Int):super(context){
@@ -33,6 +37,11 @@ class GameView:SurfaceView,Runnable {
         for(i in 1..5){
             enemies.add(Enemy(context,width,height))
         }
+        /*if(!player.isWalking){
+            for(i in 1..5){
+                projectile.add(Projectile(context,width,height,player))
+            }
+        }*/
         joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
 
 
@@ -50,7 +59,39 @@ class GameView:SurfaceView,Runnable {
         player.update(joystick.stickX,joystick.stickY)
         for (e in enemies){
             e.update(player.x,player.y)
+            for (otherEnemy in enemies){
+                if(e!=otherEnemy && Rect.intersects(e.detectCollision,otherEnemy.detectCollision)){
+                    if(e.x<otherEnemy.x){
+                        e.x-=e.speed
+                    }else{
+                        e.x+=e.speed
+                    }
+                    if(e.y<otherEnemy.y){
+                        e.y-=e.speed
+                    }else{
+                        e.y+=e.speed
+                    }
+                }
+            }
+
         }
+        for (p in projectile) {
+            p.update()
+            for (e in enemies) {
+                if (Rect.intersects(p.detectCollision, e.detectCollision)) {
+                    // A colisão ocorreu, destrua o projétil e o inimigo
+                    p.isDestroyed = true
+                    e.currentHP-=player.damage
+                }
+
+            }
+        }
+
+        projectile.removeAll { it.isDestroyed }
+        enemies.removeAll { it.isDead }
+        /*if(player.isDead){
+            System.exit(0)
+        }*/
     }
     fun draw() {
         if (surfaceHolder.surface.isValid) {
@@ -61,7 +102,11 @@ class GameView:SurfaceView,Runnable {
             for (e in enemies){
                 canvas?.drawBitmap(e.getRotatedBitmap(), e.x, e.y, paint)
             }
-            paint.color = Color.WHITE
+            paint.color = Color.BLACK
+            for (p in projectile){
+                paint.strokeWidth=p.bWidth
+                canvas?.drawPoint(p.x,p.y,paint)
+            }
             surfaceHolder.unlockCanvasAndPost(canvas)
         }
     }
@@ -75,7 +120,44 @@ class GameView:SurfaceView,Runnable {
                 }
             }
             MotionEvent.ACTION_UP->{
-                player.isWalking=false
+                player.isWalking = false
+                val playerDirection = player.getPlayerDirection()
+
+
+                // Agendando a adição de projéteis restantes com um intervalo de 500 milissegundos
+                val interval = 500
+                val handler = Handler(Looper.getMainLooper())
+                projectile.add(
+                    Projectile(
+                        context,
+                        width,
+                        height,
+                        player,
+                        playerDirection.first,
+                        playerDirection.second
+                    )
+                )
+
+                handler.postDelayed(object : Runnable {
+                    override fun run() {
+                        if (!player.isWalking) {
+                            projectile.add(
+                                Projectile(
+                                    context,
+                                    width,
+                                    height,
+                                    player,
+                                    playerDirection.first,
+                                    playerDirection.second
+                                )
+                            )
+                            handler.postDelayed(this, interval.toLong())
+                        }
+                    }
+                }, interval.toLong())
+
+
+
                 joystick.resetStick()
             }
         }
