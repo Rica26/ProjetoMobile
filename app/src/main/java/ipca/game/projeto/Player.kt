@@ -3,7 +3,10 @@ package ipca.game.projeto
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.graphics.Rect
 import android.util.Log
 import kotlin.math.sqrt
@@ -45,6 +48,26 @@ class Player {
         detectCollision=Rect(x.toInt(),y.toInt(),bitmap.width,bitmap.height)
 
     }
+    fun drawHealthBar(canvas: Canvas, paint: Paint) {
+        // Lógica para desenhar a barra de HP em relação à posição do jogador
+        val barWidth = 100 // A largura da barra de HP (ajuste conforme necessário)
+        val barHeight = 20 // A altura da barra de HP (ajuste conforme necessário)
+        val barLeft = x - barWidth / 2 // Posição esquerda da barra de HP em relação ao jogador
+        val barTop = y - 30 // Posição superior da barra de HP acima do jogador
+        val barRight = barLeft + (barWidth * currentHP / maxHP) // Largura proporcional à saúde atual
+        val barBottom = barTop + barHeight // Posição inferior da barra de HP
+
+        // Ajusta a cor com base na saúde do jogador
+        val healthColor = when {
+            currentHP > maxHP * 0.5 -> Color.rgb(0, 255, 0) // Amarelo
+            currentHP < maxHP * 0.25 -> Color.rgb(255, (255 * (currentHP / (maxHP * 0.5))).toInt(), 0) // Vermelho gradual
+            else -> Color.rgb(255, 255, 0) // Vermelho
+        }
+        paint.color = healthColor
+
+        // Desenha a barra de HP
+        canvas.drawRect(barLeft, barTop, barRight, barBottom, paint)
+    }
 
     fun update(stickX:Float,stickY:Float) {
 
@@ -67,7 +90,8 @@ class Player {
             y = y.coerceIn(0f, maxY.toFloat())
             rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
         }
-        if(currentHP<=0){
+        if(currentHP<0){
+            currentHP=0
             isDead=true
         }
 

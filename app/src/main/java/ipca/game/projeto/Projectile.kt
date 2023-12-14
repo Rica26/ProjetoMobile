@@ -12,14 +12,16 @@ class Projectile {
     var speed=0f
     var maxX=0
     var maxY=0
-    lateinit var detectCollision : Rect
+
     var isDestroyed = false
     var bWidth=0f
     var bHeight=0f
     var directionX=0f
     var directionY=0f
 
-    val player : Player
+    lateinit var detectCollision : Rect
+    lateinit var player : Player
+    lateinit var  enemy:Enemy
 
     constructor(context:Context,width:Int,height:Int, player: Player,directionX:Float,directionY: Float){
         x=player.x
@@ -34,6 +36,23 @@ class Projectile {
         bHeight=20f
         detectCollision=Rect(x.toInt(),y.toInt(),bWidth.toInt(),bHeight.toInt())
     }
+
+    constructor(context: Context,width: Int,height: Int,enemy: Enemy,directionX: Float,directionY: Float){
+        x=enemy.x
+        y=enemy.y
+        this.enemy=enemy
+        this.directionX=directionX
+        this.directionY=directionY
+        speed=20f
+        maxX=width
+        maxY=height
+        bWidth=40f
+        bHeight=40f
+        detectCollision=Rect(x.toInt(),y.toInt(),bWidth.toInt(),bHeight.toInt())
+
+
+    }
+
 
     fun update() {
 

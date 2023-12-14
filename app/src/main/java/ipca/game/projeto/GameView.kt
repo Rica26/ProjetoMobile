@@ -59,6 +59,27 @@ class GameView:SurfaceView,Runnable {
         player.update(joystick.stickX,joystick.stickY)
         for (e in enemies){
             e.update(player.x,player.y)
+            if(Rect.intersects(e.detectCollision,player.detectCollision)){
+                if(e.x<player.x){
+                    e.x-=e.speed
+                }else{
+                    e.x+e.speed
+                }
+                if(e.y<player.y){
+                    e.y-=e.speed
+                }else{
+                    e.y+=e.speed
+                }
+                if (System.currentTimeMillis() >= e.lastDamageTime + e.damageCooldown) {
+
+                    if (player.currentHP>0) {
+                        player.currentHP -= e.damage
+                        e.lastDamageTime = System.currentTimeMillis()
+                        Log.d("GameView", "Current HP: ${player.currentHP}")
+                    }
+
+                }
+            }
             for (otherEnemy in enemies){
                 if(e!=otherEnemy && Rect.intersects(e.detectCollision,otherEnemy.detectCollision)){
                     if(e.x<otherEnemy.x){
@@ -99,6 +120,7 @@ class GameView:SurfaceView,Runnable {
             canvas?.drawBitmap(backgroundImage, 0f, 0f, paint)
             joystick.draw(canvas!!)
             canvas?.drawBitmap(player.getRotatedBitmap(), player.x, player.y, paint)
+            player.drawHealthBar(canvas!!,paint)
             for (e in enemies){
                 canvas?.drawBitmap(e.getRotatedBitmap(), e.x, e.y, paint)
             }

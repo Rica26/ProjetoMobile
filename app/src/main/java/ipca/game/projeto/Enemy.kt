@@ -19,6 +19,8 @@ class Enemy {
     var speed=0
     var maxHP:Int
     var currentHP:Int
+    var lastDamageTime = System.currentTimeMillis()
+    val damageCooldown = 3000L
     var maxX=0
     var maxY=0
     val generator=Random()
