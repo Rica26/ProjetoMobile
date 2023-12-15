@@ -25,6 +25,9 @@ class GameView:SurfaceView,Runnable {
     val enemySpawnHandler = Handler(Looper.getMainLooper())
     val enemyShootCooldown = 2000L
     var lastEnemyShootTime: Long = 0
+    var bossList=CopyOnWriteArrayList<Boss>()
+    var boss:Boss
+    var playerList=CopyOnWriteArrayList<Player>()
     var paint:Paint
     var canvas:Canvas?=null
     var player:Player
@@ -33,7 +36,9 @@ class GameView:SurfaceView,Runnable {
     var projectile= CopyOnWriteArrayList<Projectile>()
     var pEnemy=CopyOnWriteArrayList<ProjectileEnemy>()
     var enemyTypeRandom:Int
+    var bossSpawned=false
     lateinit var enemyType: EnemyType
+    var enemyDead=0
     val generator=Random()
     val backgroundImage: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
@@ -46,35 +51,45 @@ class GameView:SurfaceView,Runnable {
 
         joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
         player=Player(context,width,height,joystick)
+        playerList.add(player)
+        boss= Boss(context,width, height)
+
+
 
 
 
             enemySpawnHandler.postDelayed(object :Runnable{
                 override fun run() {
                     enemyTypeRandom=generator.nextInt(100)+1
-                    if(enemyTypeRandom<=35){
+                    if(!bossSpawned && enemyDead==5){
+                        Log.d("GameView", "Spawning boss...")
+                        //boss=Boss(context, width, height)
+                        bossList.add(boss)
+                        enemies.clear()
+                        bossSpawned=true
+                    }else Log.d("GameView", "Not spawning boss. bossSpawned=$bossSpawned, enemyDead=$enemyDead")
+                    if(enemyTypeRandom<=35 && !bossSpawned){
                         enemyType=EnemyType.SKELETON
                         val enemy=Enemy(context,width, height,enemyType)
                         enemies.add(enemy)
 
                     }
-                    else if(enemyTypeRandom>=50){
+                    else if(enemyTypeRandom>=50 && !bossSpawned){
                         enemyType=EnemyType.ZOMBIE
                         val enemy=Enemy(context,width, height,enemyType)
                         enemies.add(enemy)
 
                     }
                     else{
-                        enemyType=EnemyType.SLIME
-                        val enemy=Enemy(context,width, height,enemyType)
-                        enemies.add(enemy)
+                        if(!bossSpawned) {
+                            enemyType = EnemyType.SLIME
+                            val enemy = Enemy(context, width, height, enemyType)
+                            enemies.add(enemy)
+                        }
                     }
                     enemySpawnHandler.postDelayed(this,5000)
                 }
             },5000)
-
-
-
 
     }
     private fun spawnEnemyProjectiles(enemy: Enemy) {
@@ -107,7 +122,9 @@ class GameView:SurfaceView,Runnable {
 
     }
     fun update(){
-        player.update(joystick)
+        for (p in playerList) {
+            p.update(joystick)
+        }
         for (e in enemies){
             e.update(player)
             spawnEnemyProjectiles(e)
@@ -124,13 +141,10 @@ class GameView:SurfaceView,Runnable {
                 }
                 if (System.currentTimeMillis() >= e.lastDamageTime + e.damageCooldown) {
 
-                    if (player.currentHP>0) {
+                    if (!player.isDead) {
                         player.currentHP -= e.damage
-                        //e.lastDamageTime = System.currentTimeMillis()
                         if(e.enemyType==EnemyType.SLIME){
                             joystick.decreaseSpeed(3)
-                            Log.d("Speed","Speed: ${joystick.maxSpeed}")
-                            Log.d("Player Speed", "Speed: ${player.speed}")
                         }
                         e.lastDamageTime = System.currentTimeMillis()
                     }
@@ -151,6 +165,9 @@ class GameView:SurfaceView,Runnable {
                     }
                 }
             }
+            if(e.isDead){
+                enemyDead++
+            }
 
         }
         for (p in projectile) {
@@ -161,8 +178,13 @@ class GameView:SurfaceView,Runnable {
                     p.isDestroyed = true
                     e.currentHP-=player.damage
                 }
+            }
+            for (b in bossList){
 
-
+                if(Rect.intersects(p.detectCollision,b.detectCollision)) {
+                    p.isDestroyed = true
+                    b.currentHP -= player.damage
+                }
             }
 
         }
@@ -179,10 +201,40 @@ class GameView:SurfaceView,Runnable {
                 }
             }
         }
+        for(b in bossList){
+            b.update(player)
+            if(Rect.intersects(b.detectCollision,player.detectCollision)) {
+                if (b.x < player.x) {
+                    b.x -= b.speed
+                } else {
+                    b.x + b.speed
+                }
+                if (b.y < player.y) {
+                    b.y -= b.speed
+                } else {
+                    b.y += b.speed
+                }
+            }
+            if(Rect.intersects(b.detectCollision,player.detectCollision)){
+                if(System.currentTimeMillis() >= b.lastDamageTime + b.damageCooldown) {
+                    if(!player.isDead) {
+                        player.currentHP -= b.damage
+                        b.lastDamageTime = System.currentTimeMillis()
+                    }
+                }
+            }
+
+
+        }
 
         projectile.removeAll { it.isDestroyed }
         enemies.removeAll { it.isDead }
         pEnemy.removeAll{it.isDestroyed}
+        bossList.removeAll{it.isDead}
+        playerList.removeAll{it.isDead}
+
+
+
         /*if(player.isDead){
             System.exit(0)
         }*/
@@ -192,8 +244,10 @@ class GameView:SurfaceView,Runnable {
             canvas = surfaceHolder.lockCanvas()
             canvas?.drawBitmap(backgroundImage, 0f, 0f, paint)
             joystick.draw(canvas!!)
-            canvas?.drawBitmap(player.getRotatedBitmap(), player.x, player.y, paint)
-            player.drawHealthBar(canvas!!,paint)
+            for(p in playerList) {
+                canvas?.drawBitmap(p.getRotatedBitmap(), p.x, p.y, paint)
+                p.drawHealthBar(canvas!!, paint)
+            }
             for (e in enemies){
                 canvas?.drawBitmap(e.getRotatedBitmap(), e.x, e.y, paint)
             }
@@ -205,6 +259,9 @@ class GameView:SurfaceView,Runnable {
             for(p in pEnemy){
                 paint.strokeWidth=10f
                 canvas?.drawCircle(p.x,p.y,p.bWidth/2,paint)
+            }
+            for(b in bossList) {
+                canvas?.drawBitmap(b.getRotatedBitmap(), b.x, b.y, paint)
             }
             surfaceHolder.unlockCanvasAndPost(canvas)
         }
@@ -239,7 +296,7 @@ class GameView:SurfaceView,Runnable {
 
                 handler.postDelayed(object : Runnable {
                     override fun run() {
-                        if (!player.isWalking) {
+                        if (!player.isWalking && !player.isDead) {
                             projectile.add(
                                 Projectile(
                                     context,

@@ -47,7 +47,7 @@ class Enemy {
             EnemyType.ZOMBIE-> {
                 maxX = width
                 maxY = height
-                speed = 5
+                speed = 7
                 damage = 5
                 maxHP = 50
                 isRanged=false
@@ -67,7 +67,7 @@ class Enemy {
                 maxY = height
                 speed = 5
                 damage = 10
-                maxHP = 20
+                maxHP = 30
                 isRanged=true
 
                 currentHP = maxHP
