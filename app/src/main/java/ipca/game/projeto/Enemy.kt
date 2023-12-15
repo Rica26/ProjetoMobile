@@ -12,6 +12,10 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.atan2
 
+enum class EnemyType {
+    ZOMBIE,
+    SKELETON
+}
 class Enemy {
     var bitmap: Bitmap
     var x=0f
@@ -30,38 +34,88 @@ class Enemy {
     var rotationAngle=0f
     var directionX=0f
     var directionY=0f
+    var isRanged=false
+    //var enemyType: EnemyType=EnemyType.ZOMBIE
 
-    constructor(context:Context,width:Int,height:Int){
-        maxX=width
-        maxY=height
-        speed=5
-        damage=5
-        maxHP=50
-        currentHP=maxHP
 
-        bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.zombie)
-        x = (generator.nextInt(maxX - bitmap.width) ).toFloat()
-        y = (generator.nextInt(maxY - bitmap.height) ).toFloat()
 
-        detectCollision = Rect(x.toInt() ,y.toInt(), bitmap.width, bitmap.height)
+    constructor(context:Context,width:Int,height:Int,enemyType: EnemyType){
+        when(enemyType) {
 
+            EnemyType.ZOMBIE-> {
+                maxX = width
+                maxY = height
+                speed = 5
+                damage = 5
+                maxHP = 50
+                isRanged=false
+
+                currentHP = maxHP
+
+                bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.zombie)
+                x = (generator.nextInt(maxX - bitmap.width)).toFloat()
+
+                y = (generator.nextInt(maxY - bitmap.height)).toFloat()
+
+                detectCollision = Rect(x.toInt(), y.toInt(), bitmap.width, bitmap.height)
+
+            }
+            EnemyType.SKELETON -> {
+                maxX = width
+                maxY = height
+                speed = 5
+                damage = 10
+                maxHP = 50
+                isRanged=true
+
+                currentHP = maxHP
+
+                bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.skeleton)
+                x = (generator.nextInt(maxX - bitmap.width)).toFloat()
+
+                y = (generator.nextInt(maxY - bitmap.height)).toFloat()
+
+                detectCollision = Rect(x.toInt(), y.toInt(), bitmap.width, bitmap.height)
+
+
+            }
+        }
     }
 
     fun update(playerx: Float, playery: Float) {
-        // Calcula a diferença entre as posições do jogador e do inimigo
-        val deltaX = playerx - x
-        val deltaY = playery - y
 
-        // Calcula a distância total entre o jogador e o inimigo
-        val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
+        if(!isRanged) {
+            val deltaX = playerx - x
+            val deltaY = playery - y
 
-        // Normaliza o vetor de direção para suavizar o movimento
-        directionX = if (distance > 0) deltaX / distance else 0f
-        directionY = if (distance > 0) deltaY / distance else 0f
+            // Calcula a distância total entre o jogador e o inimigo
+            val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
-        // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
-        x += directionX * speed
-        y += directionY * speed
+            // Normaliza o vetor de direção para suavizar o movimento
+            directionX = if (distance > 0) deltaX / distance else 0f
+            directionY = if (distance > 0) deltaY / distance else 0f
+
+            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
+            x += directionX * speed
+            y += directionY * speed
+        }
+
+        if(isRanged){
+            val deltaX = playerx - x
+            val deltaY = playery - y
+
+            // Calcula a distância total entre o jogador e o inimigo
+            val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
+
+            // Normaliza o vetor de direção para suavizar o movimento
+            directionX = if (distance > 0) deltaX / distance else 0f
+            directionY = if (distance > 0) deltaY / distance else 0f
+
+            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
+            x -= directionX
+            y -= directionY
+
+        }
 
         // Garante que o inimigo não ultrapasse os limites da tela
         x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
@@ -84,6 +138,12 @@ class Enemy {
         matrix.postRotate(rotationAngle, bitmap.width / 2f, bitmap.height / 2f)
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+    fun getEnemyDirection(): Pair<Float, Float> {
+        val radians = Math.toRadians(rotationAngle.toDouble())
+        val directionX = cos(radians).toFloat()
+        val directionY = sin(radians).toFloat()
+        return Pair(directionX, directionY)
     }
 
 

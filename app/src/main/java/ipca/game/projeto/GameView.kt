@@ -14,38 +14,119 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.Button
+import java.util.Random
+import java.util.concurrent.CopyOnWriteArrayList
 
 class GameView:SurfaceView,Runnable {
 
     var isPlaying=false
     var gameThread:Thread?=null
     var surfaceHolder:SurfaceHolder
+    val enemySpawnHandler = Handler(Looper.getMainLooper())
     var paint:Paint
     var canvas:Canvas?=null
     var player:Player
-    var enemies= arrayListOf<Enemy>()
+    var enemies= CopyOnWriteArrayList<Enemy>()
     var joystick:Joystick
-    var projectile= arrayListOf<Projectile>()
+    var projectile= CopyOnWriteArrayList<Projectile>()
+    var pEnemy=CopyOnWriteArrayList<ProjectileEnemy>()
+    var enemyTypeRandom:Int
+    lateinit var enemyType: EnemyType
+    val generator=Random()
     val backgroundImage: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
 
     constructor(context: Context,width:Int,height:Int):super(context){
         surfaceHolder=holder
         paint=Paint()
 
+        enemyTypeRandom=generator.nextInt(2)
+        enemyType=EnemyType.SKELETON
+
         player=Player(context,width,height)
 
-        for(i in 1..5){
-            enemies.add(Enemy(context,width,height))
-        }
-        /*if(!player.isWalking){
-            for(i in 1..5){
-                projectile.add(Projectile(context,width,height,player))
-            }
+
+
+            enemySpawnHandler.postDelayed(object :Runnable{
+                override fun run() {
+                    enemyTypeRandom=generator.nextInt(2)
+                    if(enemyTypeRandom==1){
+                        enemyType=EnemyType.SKELETON
+                        enemies.add(Enemy(context,width, height,enemyType))
+                        Log.d("GameView","Enemy: ${enemies.size}")
+                    }
+                    else{
+                        enemyType=EnemyType.ZOMBIE
+                        enemies.add(Enemy(context,width, height,enemyType))
+                        Log.d("GameView","Enemy: ${enemies.size}")
+                    }
+                    enemySpawnHandler.postDelayed(this,3000)
+                }
+            },3000)
+        /*for(e in enemies) {
+            Log.d("Projectile", "Checking enemy: isRanged=${e.isRanged}, isDead=${e.isDead}")
+            Log.d("Projectile","Enemy: ${enemies.size}")
+            println("Checking enemy: isRanged=${enemies.size}")
+            enemySpawnHandler.postDelayed(object : Runnable {
+                override fun run() {
+                    if (e.isRanged && !e.isDead) {
+                        val enemyDir = e.getEnemyDirection()
+                        pEnemy.add(
+                            ProjectileEnemy(
+                                context,
+                                width,
+                                height,
+                                e,
+                                enemyDir.first,
+                                enemyDir.second
+                            )
+                        )
+                        Log.d("Projectile", "ProjectileEnemy added. pEnemy size: ${pEnemy.size}")
+
+
+                    }
+                    enemySpawnHandler.postDelayed(this, 500)
+                }
+
+            }, 500)
+            //Log.d("GameView","pEnemy: ${pEnemy.size}")
+
         }*/
+
+
         joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
 
 
     }
+    /*private fun spawnEnemyProjectiles() {
+        for (e in enemies) {
+            if (e.isRanged && !e.isDead) {
+                val enemyDir = e.getEnemyDirection()
+
+
+                val handler = Handler(Looper.getMainLooper())
+                handler.postDelayed(object : Runnable {
+                    override fun run() {
+                        pEnemy.add(
+                            ProjectileEnemy(
+                                context,
+                                width,
+                                height,
+                                e,
+                                enemyDir.first,
+                                enemyDir.second
+                            )
+                        )
+
+
+                        if (!e.isDead) {
+                            handler.postDelayed(this, 1000)
+                        }
+                    }
+                }, 1000)
+            }
+        }
+    }*/
+
 
     override fun run() {
         while (isPlaying){
@@ -75,7 +156,6 @@ class GameView:SurfaceView,Runnable {
                     if (player.currentHP>0) {
                         player.currentHP -= e.damage
                         e.lastDamageTime = System.currentTimeMillis()
-                        Log.d("GameView", "Current HP: ${player.currentHP}")
                     }
 
                 }
@@ -105,11 +185,27 @@ class GameView:SurfaceView,Runnable {
                     e.currentHP-=player.damage
                 }
 
+
+            }
+
+        }
+
+
+        //spawnEnemyProjectiles()
+
+        for(p in pEnemy){
+            p.update()
+            for(e in enemies) {
+                if (Rect.intersects(p.detectCollision, player.detectCollision)) {
+                    p.isDestroyed = true
+                    player.currentHP -= e.damage
+                }
             }
         }
 
         projectile.removeAll { it.isDestroyed }
         enemies.removeAll { it.isDead }
+        pEnemy.removeAll{it.isDestroyed}
         /*if(player.isDead){
             System.exit(0)
         }*/
@@ -126,6 +222,10 @@ class GameView:SurfaceView,Runnable {
             }
             paint.color = Color.BLACK
             for (p in projectile){
+                paint.strokeWidth=p.bWidth
+                canvas?.drawPoint(p.x,p.y,paint)
+            }
+            for(p in pEnemy){
                 paint.strokeWidth=p.bWidth
                 canvas?.drawPoint(p.x,p.y,paint)
             }

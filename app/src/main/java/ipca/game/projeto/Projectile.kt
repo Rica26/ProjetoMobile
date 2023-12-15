@@ -37,21 +37,7 @@ class Projectile {
         detectCollision=Rect(x.toInt(),y.toInt(),bWidth.toInt(),bHeight.toInt())
     }
 
-    constructor(context: Context,width: Int,height: Int,enemy: Enemy,directionX: Float,directionY: Float){
-        x=enemy.x
-        y=enemy.y
-        this.enemy=enemy
-        this.directionX=directionX
-        this.directionY=directionY
-        speed=20f
-        maxX=width
-        maxY=height
-        bWidth=40f
-        bHeight=40f
-        detectCollision=Rect(x.toInt(),y.toInt(),bWidth.toInt(),bHeight.toInt())
 
-
-    }
 
 
     fun update() {
