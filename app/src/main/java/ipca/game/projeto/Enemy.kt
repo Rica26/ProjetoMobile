@@ -14,7 +14,8 @@ import kotlin.math.atan2
 
 enum class EnemyType {
     ZOMBIE,
-    SKELETON
+    SKELETON,
+    SLIME
 }
 class Enemy {
     var bitmap: Bitmap
@@ -35,11 +36,12 @@ class Enemy {
     var directionX=0f
     var directionY=0f
     var isRanged=false
-    //var enemyType: EnemyType=EnemyType.ZOMBIE
+    lateinit var enemyType: EnemyType
 
 
 
     constructor(context:Context,width:Int,height:Int,enemyType: EnemyType){
+        this.enemyType=enemyType
         when(enemyType) {
 
             EnemyType.ZOMBIE-> {
@@ -65,7 +67,7 @@ class Enemy {
                 maxY = height
                 speed = 5
                 damage = 10
-                maxHP = 50
+                maxHP = 20
                 isRanged=true
 
                 currentHP = maxHP
@@ -79,14 +81,32 @@ class Enemy {
 
 
             }
+            EnemyType.SLIME->{
+                maxX = width
+                maxY = height
+                speed = 1
+                damage = 2
+                maxHP = 70
+                isRanged=false
+
+                currentHP = maxHP
+
+                bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.slime)
+                x = (generator.nextInt(maxX - bitmap.width)).toFloat()
+
+                y = (generator.nextInt(maxY - bitmap.height)).toFloat()
+
+                detectCollision = Rect(x.toInt(), y.toInt(), bitmap.width, bitmap.height)
+
+            }
         }
     }
 
-    fun update(playerx: Float, playery: Float) {
+    fun update(player: Player) {
 
         if(!isRanged) {
-            val deltaX = playerx - x
-            val deltaY = playery - y
+            val deltaX = player.x - x
+            val deltaY = player.y - y
 
             // Calcula a distância total entre o jogador e o inimigo
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
@@ -101,8 +121,8 @@ class Enemy {
         }
 
         if(isRanged){
-            val deltaX = playerx - x
-            val deltaY = playery - y
+            val deltaX = player.x - x
+            val deltaY = player.y - y
 
             // Calcula a distância total entre o jogador e o inimigo
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
@@ -116,6 +136,9 @@ class Enemy {
             y -= directionY
 
         }
+        /*if(enemyType==EnemyType.SLIME){
+            player.speed=-1
+        }*/
 
         // Garante que o inimigo não ultrapasse os limites da tela
         x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)

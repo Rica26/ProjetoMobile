@@ -28,6 +28,7 @@ class Player {
 
     var maxX=0
     var maxY=0
+    var speed=0
     var isWalking = false
     var isDead = false
     //var lastShootTime = System.currentTimeMillis()
@@ -35,19 +36,20 @@ class Player {
 
     lateinit var detectCollision : Rect
     var rotationAngle = 0f
-    constructor(context: Context,width: Int, height: Int){
+    constructor(context: Context,width: Int, height: Int,joystick: Joystick){
         x=70f
         y=50f
         maxHP=100
         currentHP=maxHP
-        damage=10
+        damage=30
         bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.cowboy)
-        joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
+        this.joystick = joystick
         maxY= height-bitmap.height
         maxX= width-bitmap.width
         detectCollision=Rect(x.toInt(),y.toInt(),bitmap.width,bitmap.height)
 
     }
+
     fun drawHealthBar(canvas: Canvas, paint: Paint) {
         // Lógica para desenhar a barra de HP em relação à posição do jogador
         val barWidth = 100 // A largura da barra de HP (ajuste conforme necessário)
@@ -69,18 +71,18 @@ class Player {
         canvas.drawRect(barLeft, barTop, barRight, barBottom, paint)
     }
 
-    fun update(stickX:Float,stickY:Float) {
+    fun update(joystick: Joystick) {
 
         if(isWalking) {
-            val deltaX = stickX - joystick.centerX
-            val deltaY = stickY - joystick.centerY
+            val deltaX = joystick.stickX - joystick.centerX
+            val deltaY = joystick.stickY - joystick.centerY
 
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
             val directionX = if (distance > 0) deltaX / distance else 0f
             val directionY = if (distance > 0) deltaY / distance else 0f
 
-            val speed = distance.coerceAtMost(joystick.maxSpeed)
+            speed = distance.coerceAtMost(joystick.maxSpeed.toFloat()).toInt()
 
 
             x += directionX * speed

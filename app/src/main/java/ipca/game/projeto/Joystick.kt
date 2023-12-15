@@ -17,7 +17,7 @@ class Joystick( val centerX: Float, val centerY: Float, val baseRadius: Float, v
 
     var stickX: Float = centerX
     var stickY: Float = centerY
-    var maxSpeed: Float = 20f
+    var maxSpeed: Int = 20
     var lastDirection:Pair<Float, Float> = Pair(0f,0f)
 
     init {
@@ -48,6 +48,14 @@ class Joystick( val centerX: Float, val centerY: Float, val baseRadius: Float, v
 
             stickX = newX
             stickY = newY
+        }
+    }
+    fun decreaseSpeed(amount: Int) {
+        maxSpeed -= amount
+
+        // Certifique-se de que a velocidade não se torne negativa
+        if (maxSpeed < 0) {
+            maxSpeed = 0
         }
     }
 

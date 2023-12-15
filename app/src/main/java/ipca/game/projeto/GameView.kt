@@ -41,35 +41,39 @@ class GameView:SurfaceView,Runnable {
         surfaceHolder=holder
         paint=Paint()
 
-        enemyTypeRandom=generator.nextInt(2)
-        enemyType=EnemyType.SKELETON
+        enemyTypeRandom=0
+        //enemyType=EnemyType.SKELETON
 
-        player=Player(context,width,height)
+        joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
+        player=Player(context,width,height,joystick)
 
 
 
             enemySpawnHandler.postDelayed(object :Runnable{
                 override fun run() {
-                    enemyTypeRandom=generator.nextInt(2)
-                    if(enemyTypeRandom==1){
+                    enemyTypeRandom=generator.nextInt(100)+1
+                    if(enemyTypeRandom<=35){
                         enemyType=EnemyType.SKELETON
                         val enemy=Enemy(context,width, height,enemyType)
                         enemies.add(enemy)
 
                     }
-                    else{
+                    else if(enemyTypeRandom>=50){
                         enemyType=EnemyType.ZOMBIE
                         val enemy=Enemy(context,width, height,enemyType)
                         enemies.add(enemy)
 
                     }
-                    enemySpawnHandler.postDelayed(this,3000)
+                    else{
+                        enemyType=EnemyType.SLIME
+                        val enemy=Enemy(context,width, height,enemyType)
+                        enemies.add(enemy)
+                    }
+                    enemySpawnHandler.postDelayed(this,5000)
                 }
-            },3000)
+            },5000)
 
 
-
-        joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
 
 
     }
@@ -103,9 +107,9 @@ class GameView:SurfaceView,Runnable {
 
     }
     fun update(){
-        player.update(joystick.stickX,joystick.stickY)
+        player.update(joystick)
         for (e in enemies){
-            e.update(player.x,player.y)
+            e.update(player)
             spawnEnemyProjectiles(e)
             if(Rect.intersects(e.detectCollision,player.detectCollision)){
                 if(e.x<player.x){
@@ -122,6 +126,12 @@ class GameView:SurfaceView,Runnable {
 
                     if (player.currentHP>0) {
                         player.currentHP -= e.damage
+                        //e.lastDamageTime = System.currentTimeMillis()
+                        if(e.enemyType==EnemyType.SLIME){
+                            joystick.decreaseSpeed(3)
+                            Log.d("Speed","Speed: ${joystick.maxSpeed}")
+                            Log.d("Player Speed", "Speed: ${player.speed}")
+                        }
                         e.lastDamageTime = System.currentTimeMillis()
                     }
 
