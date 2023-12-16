@@ -26,6 +26,7 @@ class Enemy {
     var currentHP:Int
     var lastDamageTime = System.currentTimeMillis()
     val damageCooldown = 3000L
+    var lastEnemyShootTime: Long = 0
     var maxX=0
     var maxY=0
     val generator=Random()

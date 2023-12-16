@@ -28,9 +28,10 @@ class GameView:SurfaceView,Runnable {
     val enemySpawnHandler = Handler(Looper.getMainLooper())
     val bulletHandler = Handler(Looper.getMainLooper())
     val enemyShootCooldown = 2000L
-    var lastEnemyShootTime: Long = 0
+    val buffHandler=Handler(Looper.getMainLooper())
     var bossList=CopyOnWriteArrayList<Boss>()
     var boss:Boss
+    var buffs=CopyOnWriteArrayList<Buff>()
     var playerList=CopyOnWriteArrayList<Player>()
     var paint:Paint
     var canvas:Canvas?=null
@@ -40,8 +41,10 @@ class GameView:SurfaceView,Runnable {
     var projectile= CopyOnWriteArrayList<Projectile>()
     var pEnemy=CopyOnWriteArrayList<ProjectileEnemy>()
     var enemyTypeRandom:Int
+    var buffTypeRandom:Int
     var bossSpawned=false
     lateinit var enemyType: EnemyType
+    lateinit var buffType: BuffType
     var enemyDead=0
     val generator=Random()
     val backgroundImage: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bg)
@@ -51,6 +54,7 @@ class GameView:SurfaceView,Runnable {
         paint=Paint()
 
         enemyTypeRandom=0
+        buffTypeRandom=0
 
         joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
         player=Player(context,width,height,joystick)
@@ -81,12 +85,29 @@ class GameView:SurfaceView,Runnable {
                     enemySpawnHandler.postDelayed(this,5000)
                 }
             },5000)
+        buffHandler.postDelayed(object:Runnable{
+            override fun run() {
+                buffTypeRandom=generator.nextInt(100)+1
+                if(buffTypeRandom>15){
+                    buffType=BuffType.ATTACK
+                    val buff=Buff(context,width,height, buffType)
+                    buffs.add(buff)
+                }
+                else{
+                    buffType=BuffType.HP
+                    val buff=Buff(context,width,height, buffType)
+                    buffs.add(buff)
+                }
+                Log.d("Buff", "Buff created. Type: $buffType, Position: ($x, $y)")
+                buffHandler.postDelayed(this,20000)
+            }
+        },20000)
 
 
     }
     fun spawnEnemyProjectiles(enemy: Enemy) {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastEnemyShootTime >= enemyShootCooldown) {
+        if (currentTime - enemy.lastEnemyShootTime >= enemyShootCooldown) {
             if (enemy.isRanged && !enemy.isDead) {
                 val enemyDir = enemy.getEnemyDirection()
                 pEnemy.add(
@@ -99,7 +120,7 @@ class GameView:SurfaceView,Runnable {
                         enemyDir.second
                     )
                 )
-                lastEnemyShootTime = currentTime
+                enemy.lastEnemyShootTime = currentTime
             }
         }
     }
@@ -114,11 +135,17 @@ class GameView:SurfaceView,Runnable {
 
     }
     fun update(){
+
+
         for (p in playerList) {
             p.update(joystick)
             if(p.isDead){
                 isPlaying=false
             }
+
+        }
+        for(b in buffs){
+            b.update(player)
         }
         for (e in enemies){
             e.update(player)
@@ -197,12 +224,10 @@ class GameView:SurfaceView,Runnable {
             }
         }
         if (!bossSpawned && enemyDead == 5) {
-            Log.d("GameView", "Spawning boss...")
+
             bossList.add(boss)
             bossSpawned = true
             enemies.clear()  // Limpe a lista de inimigos após spawnar o chefe
-        } else {
-            Log.d("GameView", "Not spawning boss. bossSpawned=$bossSpawned, enemyDead=$enemyDead")
         }
 
             for(b in bossList){
@@ -234,6 +259,7 @@ class GameView:SurfaceView,Runnable {
 
 
         projectile.removeAll { it.isDestroyed }
+        buffs.removeAll{it.isConsumed}
         enemies.removeAll { it.isDead }
         pEnemy.removeAll{it.isDestroyed}
         bossList.removeAll{it.isDead}
@@ -273,6 +299,9 @@ class GameView:SurfaceView,Runnable {
             }
             for(b in bossList) {
                 canvas?.drawBitmap(b.getRotatedBitmap(), b.x, b.y, paint)
+            }
+            for(b in buffs){
+                canvas?.drawBitmap(b.bitmap,b.x,b.y,paint)
             }
 
 
