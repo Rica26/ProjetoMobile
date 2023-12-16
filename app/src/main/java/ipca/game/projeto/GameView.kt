@@ -1,6 +1,7 @@
 package ipca.game.projeto
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -53,28 +54,16 @@ class GameView:SurfaceView,Runnable {
         player=Player(context,width,height,joystick)
         playerList.add(player)
         boss= Boss(context,width, height)
-
-
-
-
-
-            enemySpawnHandler.postDelayed(object :Runnable{
-                override fun run() {
-                    enemyTypeRandom=generator.nextInt(100)+1
-                    if(!bossSpawned && enemyDead==5){
-                        Log.d("GameView", "Spawning boss...")
-                        //boss=Boss(context, width, height)
-                        bossList.add(boss)
-                        enemies.clear()
-                        bossSpawned=true
-                    }else Log.d("GameView", "Not spawning boss. bossSpawned=$bossSpawned, enemyDead=$enemyDead")
-                    if(enemyTypeRandom<=35 && !bossSpawned){
+        enemySpawnHandler.postDelayed(object :Runnable{
+            override fun run() {
+                enemyTypeRandom=generator.nextInt(100)+1
+                if(enemyTypeRandom<=35 && !bossSpawned){
                         enemyType=EnemyType.SKELETON
                         val enemy=Enemy(context,width, height,enemyType)
                         enemies.add(enemy)
 
                     }
-                    else if(enemyTypeRandom>=50 && !bossSpawned){
+                else if(enemyTypeRandom>=50 && !bossSpawned){
                         enemyType=EnemyType.ZOMBIE
                         val enemy=Enemy(context,width, height,enemyType)
                         enemies.add(enemy)
@@ -90,6 +79,7 @@ class GameView:SurfaceView,Runnable {
                     enemySpawnHandler.postDelayed(this,5000)
                 }
             },5000)
+
 
     }
     private fun spawnEnemyProjectiles(enemy: Enemy) {
@@ -124,6 +114,9 @@ class GameView:SurfaceView,Runnable {
     fun update(){
         for (p in playerList) {
             p.update(joystick)
+            if(p.isDead){
+                isPlaying=false
+            }
         }
         for (e in enemies){
             e.update(player)
@@ -201,7 +194,16 @@ class GameView:SurfaceView,Runnable {
                 }
             }
         }
-        for(b in bossList){
+        if (!bossSpawned && enemyDead == 5) {
+            Log.d("GameView", "Spawning boss...")
+            bossList.add(boss)
+            bossSpawned = true
+            enemies.clear()  // Limpe a lista de inimigos após spawnar o chefe
+        } else {
+            Log.d("GameView", "Not spawning boss. bossSpawned=$bossSpawned, enemyDead=$enemyDead")
+        }
+
+            for(b in bossList){
             b.update(player)
             if(Rect.intersects(b.detectCollision,player.detectCollision)) {
                 if (b.x < player.x) {
@@ -223,9 +225,11 @@ class GameView:SurfaceView,Runnable {
                     }
                 }
             }
-
-
+            if(b.isDead){
+                isPlaying=false
+            }
         }
+
 
         projectile.removeAll { it.isDestroyed }
         enemies.removeAll { it.isDead }
@@ -235,9 +239,14 @@ class GameView:SurfaceView,Runnable {
 
 
 
-        /*if(player.isDead){
-            System.exit(0)
-        }*/
+        if(!isPlaying && player.isDead) {
+            val intent= Intent(context,GameOver::class.java)
+            context.startActivity(intent)
+        }
+        if(!isPlaying && boss.isDead){
+            val intent=Intent(context,Victory::class.java)
+            context.startActivity(intent)
+        }
     }
     fun draw() {
         if (surfaceHolder.surface.isValid) {
@@ -263,6 +272,11 @@ class GameView:SurfaceView,Runnable {
             for(b in bossList) {
                 canvas?.drawBitmap(b.getRotatedBitmap(), b.x, b.y, paint)
             }
+
+
+
+
+
             surfaceHolder.unlockCanvasAndPost(canvas)
         }
     }
