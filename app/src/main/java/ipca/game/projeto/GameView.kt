@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -15,6 +16,7 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import java.util.Random
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -24,6 +26,7 @@ class GameView:SurfaceView,Runnable {
     var gameThread:Thread?=null
     var surfaceHolder:SurfaceHolder
     val enemySpawnHandler = Handler(Looper.getMainLooper())
+    val bulletHandler = Handler(Looper.getMainLooper())
     val enemyShootCooldown = 2000L
     var lastEnemyShootTime: Long = 0
     var bossList=CopyOnWriteArrayList<Boss>()
@@ -48,7 +51,6 @@ class GameView:SurfaceView,Runnable {
         paint=Paint()
 
         enemyTypeRandom=0
-        //enemyType=EnemyType.SKELETON
 
         joystick = Joystick(width / 4f, height * 3 / 4f, 100f, 50f)
         player=Player(context,width,height,joystick)
@@ -82,7 +84,7 @@ class GameView:SurfaceView,Runnable {
 
 
     }
-    private fun spawnEnemyProjectiles(enemy: Enemy) {
+    fun spawnEnemyProjectiles(enemy: Enemy) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastEnemyShootTime >= enemyShootCooldown) {
             if (enemy.isRanged && !enemy.isDead) {
@@ -280,6 +282,28 @@ class GameView:SurfaceView,Runnable {
             surfaceHolder.unlockCanvasAndPost(canvas)
         }
     }
+
+    val shootRunnable = object : Runnable {
+        override fun run() {
+            for (p in playerList) {
+                if (!p.isWalking && !p.isDead) {
+                    val playerDir = p.getPlayerDirection()
+                    projectile.add(
+                        Projectile(
+                            context,
+                            width,
+                            height,
+                            p,
+                            playerDir.first,
+                            playerDir.second
+                        )
+                    )
+                }
+            }
+            bulletHandler.postDelayed(this, 500)  // Dispara continuamente
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
@@ -291,40 +315,10 @@ class GameView:SurfaceView,Runnable {
             }
             MotionEvent.ACTION_UP->{
                 player.isWalking = false
-                val playerDirection = player.getPlayerDirection()
 
-
-                // Agendando a adição de projéteis restantes com um intervalo de 500 milissegundos
-                val interval = 500
-                val handler = Handler(Looper.getMainLooper())
-                projectile.add(
-                    Projectile(
-                        context,
-                        width,
-                        height,
-                        player,
-                        playerDirection.first,
-                        playerDirection.second
-                    )
-                )
-
-                handler.postDelayed(object : Runnable {
-                    override fun run() {
-                        if (!player.isWalking && !player.isDead) {
-                            projectile.add(
-                                Projectile(
-                                    context,
-                                    width,
-                                    height,
-                                    player,
-                                    playerDirection.first,
-                                    playerDirection.second
-                                )
-                            )
-                            handler.postDelayed(this, interval.toLong())
-                        }
-                    }
-                }, interval.toLong())
+                if (!bulletHandler.hasCallbacks(shootRunnable)) {
+                    bulletHandler.post(shootRunnable)
+                }
 
 
 

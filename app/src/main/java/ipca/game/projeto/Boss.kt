@@ -38,9 +38,9 @@ class Boss {
     constructor(context: Context, width:Int, height:Int){
         x=(width/2).toFloat()
         y=(height/2).toFloat()
-        maxHP=200
+        maxHP=500
         currentHP=maxHP
-        damage=30
+        damage=50
         speed=5
         bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.boss)
         maxY= height-bitmap.height
