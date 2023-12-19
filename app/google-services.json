@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "519237484732",
+    "project_id": "projetoandroid-e98b7",
+    "storage_bucket": "projetoandroid-e98b7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519237484732:android:d702d2a6f0004b1a01d0b9",
+        "android_client_info": {
+          "package_name": "ipca.game.projeto"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkFcz00oTU3gRpVV9Al0BJlMz3ugWEqqo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

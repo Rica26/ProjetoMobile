@@ -24,6 +24,9 @@ class GameView:SurfaceView,Runnable {
 
     var isPlaying=false
     var gameThread:Thread?=null
+    var startTime: Long = 0
+    var elapsedTime: Long = 0
+    var finalTime:Long=0
     var surfaceHolder:SurfaceHolder
     val enemySpawnHandler = Handler(Looper.getMainLooper())
     val bulletHandler = Handler(Looper.getMainLooper())
@@ -43,6 +46,7 @@ class GameView:SurfaceView,Runnable {
     var enemyTypeRandom:Int
     var buffTypeRandom:Int
     var bossSpawned=false
+
     lateinit var enemyType: EnemyType
     lateinit var buffType: BuffType
     var enemyDead=0
@@ -272,9 +276,12 @@ class GameView:SurfaceView,Runnable {
             context.startActivity(intent)
         }
         if(!isPlaying && boss.isDead){
+            finalTime=elapsedTime
             val intent=Intent(context,Victory::class.java)
+            intent.putExtra("finalTime", finalTime)
             context.startActivity(intent)
         }
+        elapsedTime = System.currentTimeMillis() - startTime
     }
     fun draw() {
         if (surfaceHolder.surface.isValid) {
@@ -303,6 +310,7 @@ class GameView:SurfaceView,Runnable {
             for(b in buffs){
                 canvas?.drawBitmap(b.bitmap,b.x,b.y,paint)
             }
+            canvas?.drawText("Tempo: ${elapsedTime / 1000} segundos", 50f, 50f, paint)
 
 
 
@@ -364,6 +372,8 @@ class GameView:SurfaceView,Runnable {
         gameThread=Thread(this)
         gameThread?.start()
         isPlaying=true
+        startTime = System.currentTimeMillis()
+
     }
     fun pause() {
         isPlaying = false
