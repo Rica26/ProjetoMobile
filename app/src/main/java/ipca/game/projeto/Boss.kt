@@ -66,8 +66,8 @@ class Boss {
             y += directionY * speed
 
         // Garante que o inimigo não ultrapasse os limites da tela
-        x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
-        y = y.coerceIn(0f, maxY.toFloat() - bitmap.height)
+        //x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
+        //y = y.coerceIn(0f, maxY.toFloat() - bitmap.height)
         rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
 
         if(currentHP<=0){

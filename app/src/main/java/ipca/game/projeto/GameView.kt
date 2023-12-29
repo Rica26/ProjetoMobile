@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -23,6 +24,8 @@ import java.util.concurrent.CopyOnWriteArrayList
 class GameView:SurfaceView,Runnable {
 
     var isPlaying=false
+    var backgroundMusic:MediaPlayer?=null
+    var bossMusic:MediaPlayer?=null
     var gameThread:Thread?=null
     var startTime: Long = 0
     var elapsedTime: Long = 0
@@ -56,6 +59,9 @@ class GameView:SurfaceView,Runnable {
     constructor(context: Context,width:Int,height:Int):super(context){
         surfaceHolder=holder
         paint=Paint()
+        backgroundMusic=MediaPlayer.create(context,R.raw.ost)
+
+        bossMusic=MediaPlayer.create(context,R.raw.bossfightost)
 
         enemyTypeRandom=0
         buffTypeRandom=0
@@ -139,6 +145,8 @@ class GameView:SurfaceView,Runnable {
 
     }
     fun update(){
+        backgroundMusic?.isLooping = true
+        backgroundMusic?.start()
         elapsedTime = System.currentTimeMillis() - startTime
 
         for (p in playerList) {
@@ -173,6 +181,9 @@ class GameView:SurfaceView,Runnable {
                             joystick.decreaseSpeed(3)
                         }
                         e.lastDamageTime = System.currentTimeMillis()
+                        val mediaPlayer = MediaPlayer.create(context, R.raw.playergethit)
+                        mediaPlayer.start()
+                        mediaPlayer.setOnCompletionListener { mp -> mp.release() }
                     }
 
                 }
@@ -203,6 +214,9 @@ class GameView:SurfaceView,Runnable {
                     // A colisão ocorreu, destrua o projétil e o inimigo
                     p.isDestroyed = true
                     e.currentHP-=player.damage
+                    val mediaPlayer = MediaPlayer.create(context, R.raw.enemygethit)
+                    mediaPlayer.start()
+                    mediaPlayer.setOnCompletionListener { mp -> mp.release() }
                 }
             }
             for (b in bossList){
@@ -210,6 +224,9 @@ class GameView:SurfaceView,Runnable {
                 if(Rect.intersects(p.detectCollision,b.detectCollision)) {
                     p.isDestroyed = true
                     b.currentHP -= player.damage
+                    val mediaPlayer = MediaPlayer.create(context, R.raw.enemygethit)
+                    mediaPlayer.start()
+                    mediaPlayer.setOnCompletionListener { mp -> mp.release() }
                 }
             }
 
@@ -224,18 +241,33 @@ class GameView:SurfaceView,Runnable {
                 if (Rect.intersects(p.detectCollision, player.detectCollision)) {
                     p.isDestroyed = true
                     player.currentHP -= e.damage
+                    val mediaPlayer = MediaPlayer.create(context, R.raw.playergethit)
+                    mediaPlayer.start()
+                    mediaPlayer.setOnCompletionListener { mp -> mp.release() }
                 }
             }
         }
         if (!bossSpawned && enemyDead == 5) {
+            //backgroundMusic?.isLooping=false
+            //backgroundMusic?.release()
+            backgroundMusic?.stop()
+
+
+
+            bossMusic?.isLooping=true
+            bossMusic?.start()
 
             bossList.add(boss)
             bossSpawned = true
             enemies.clear()  // Limpe a lista de inimigos após spawnar o chefe
         }
 
-            for(b in bossList){
+
+        for(b in bossList){
+
+
             b.update(player)
+
             if(Rect.intersects(b.detectCollision,player.detectCollision)) {
                 if (b.x < player.x) {
                     b.x -= b.speed
@@ -248,17 +280,37 @@ class GameView:SurfaceView,Runnable {
                     b.y += b.speed
                 }
             }
+
+
             if(Rect.intersects(b.detectCollision,player.detectCollision)){
+
+
                 if(System.currentTimeMillis() >= b.lastDamageTime + b.damageCooldown) {
+
                     if(!player.isDead) {
+
                         player.currentHP -= b.damage
+
                         b.lastDamageTime = System.currentTimeMillis()
+
+                        val mediaPlayer=MediaPlayer.create(context,R.raw.playergethit)
+
+                        mediaPlayer.start()
+
+                        mediaPlayer.setOnCompletionListener { mp->mp.release() }
+
                     }
+
                 }
+
             }
+
             if(b.isDead){
+
                 isPlaying=false
+
             }
+
         }
 
 
@@ -272,10 +324,14 @@ class GameView:SurfaceView,Runnable {
 
 
         if(!isPlaying && player.isDead) {
+            bossMusic?.release()
+            backgroundMusic?.release()
             val intent= Intent(context,GameOver::class.java)
             context.startActivity(intent)
         }
         if(!isPlaying && boss.isDead){
+            bossMusic?.release()
+            backgroundMusic?.release()
             finalTime=elapsedTime
             val intent=Intent(context,Victory::class.java)
             intent.putExtra("finalTime", finalTime)
@@ -318,7 +374,7 @@ class GameView:SurfaceView,Runnable {
             val y = 70f  // Posição vertical do texto
             canvas?.drawText(text, x, y, paint)
 
-            //canvas?.drawText("Tempo: ${elapsedTime / 1000} segundos", 50f, 50f, paint)
+
 
 
 

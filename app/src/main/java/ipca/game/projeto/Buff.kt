@@ -49,9 +49,8 @@ class Buff {
     }
     fun applyBuffEffect(player: Player){
         if(buffType==BuffType.ATTACK){
-            if(player.damage<150) {
-                player.damage += 10
-            }
+            player.damage += 10
+
         }
         else{
             player.currentHP+=50
