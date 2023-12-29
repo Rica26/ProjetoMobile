@@ -139,7 +139,7 @@ class GameView:SurfaceView,Runnable {
 
     }
     fun update(){
-
+        elapsedTime = System.currentTimeMillis() - startTime
 
         for (p in playerList) {
             p.update(joystick)
@@ -281,7 +281,6 @@ class GameView:SurfaceView,Runnable {
             intent.putExtra("finalTime", finalTime)
             context.startActivity(intent)
         }
-        elapsedTime = System.currentTimeMillis() - startTime
     }
     fun draw() {
         if (surfaceHolder.surface.isValid) {
@@ -310,7 +309,16 @@ class GameView:SurfaceView,Runnable {
             for(b in buffs){
                 canvas?.drawBitmap(b.bitmap,b.x,b.y,paint)
             }
-            canvas?.drawText("Tempo: ${elapsedTime / 1000} segundos", 50f, 50f, paint)
+
+            paint.textSize = 50f  // Tamanho do texto aumentado para 30
+            paint.color = Color.BLACK  // Cor do texto
+            val text = "Tempo: ${elapsedTime / 1000} segundos"
+            val textWidth = paint.measureText(text)
+            val x = (width - textWidth) / 2  // Centralizando o texto horizontalmente
+            val y = 70f  // Posição vertical do texto
+            canvas?.drawText(text, x, y, paint)
+
+            //canvas?.drawText("Tempo: ${elapsedTime / 1000} segundos", 50f, 50f, paint)
 
 
 
