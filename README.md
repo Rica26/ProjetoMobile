@@ -446,7 +446,9 @@ constructor(context:Context,width:Int,height:Int,enemyType: EnemyType){
 
 ```
 no _update_, que recebe um player como argumento, já dividimos a lógica em o inimigo ser _ranged_ ou não, se for ranged afasta-se do player, se não for ranged aproxima-se do player ambos com velocidade constante(e respetiva dependendo do EnemyType) e usando o coerceIn tal como no player para não poderem _spawnar_ fora das bordas do jogo. Calcula também o angulo de rotação para depois usar numa função posterior,trata da morte dos inimigos e faz a deteção de colisão de acordo com o retangulo definido nos construtores.
-    ```kotlin
+    
+```kotlin
+    
     fun update(player: Player) {
 
         if(!isRanged) {
