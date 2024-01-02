@@ -501,7 +501,7 @@ no _update_, que recebe um player como argumento, já dividimos a lógica em o i
         detectCollision.bottom = (y + bitmap.height).toInt()
     }
     
-    ```
+```
 por fim, tal como no _Player_, tem duas funções auxiliares uma para tratar da "animação" usando o _Matrix_() e o rotationagle calculado no update e outra para obter a direção do inimigo.
 
 ```kotlin
