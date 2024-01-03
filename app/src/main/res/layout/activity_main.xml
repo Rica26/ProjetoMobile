@@ -34,7 +34,7 @@
         tools:srcCompat="@drawable/startbutton" />
 
     <ImageButton
-        android:id="@+id/imageButtonExit"
+        android:id="@+id/imageButtonLeaderboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="283dp"
@@ -46,5 +46,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.371"
-        app:srcCompat="@drawable/exitbutton" />
+        app:srcCompat="@drawable/leaderboard" />
 </androidx.constraintlayout.widget.ConstraintLayout>

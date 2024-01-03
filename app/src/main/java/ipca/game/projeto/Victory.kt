@@ -31,7 +31,9 @@ class Victory : AppCompatActivity() {
         // Configurando o texto do TextView
         textViewTime.text = "Time: $seconds segundos"
 
-        checkAndUpdateScore(seconds)
+        FirebaseHelpers.sendScore(seconds){
+
+        }
         findViewById<ImageButton>(R.id.imageButtonVRetry).setOnClickListener {
             val intent= Intent(this,GameActivity::class.java)
             startActivity(intent)
@@ -40,7 +42,7 @@ class Victory : AppCompatActivity() {
 
     }
 
-    private fun checkAndUpdateScore(newTime: Long) {
+    /*private fun checkAndUpdateScore(newTime: Long) {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val userDocRef = FirebaseHelpers.db.collection("users").document(currentUser?.uid!!)
 
@@ -62,7 +64,28 @@ class Victory : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error getting user document", e)
             }
-    }
+    }*/
+    /*private fun checkAndUpdateScore(newTime: Long) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userDocRef = FirebaseHelpers.db.collection("users").document(currentUser?.uid!!)
+
+        // Obtém a lista de tempos atual armazenada na base de dados
+        userDocRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                val currentTimes = documentSnapshot.get("times") as? List<Long> ?: emptyList()
+
+                // Adiciona o novo tempo à lista de tempos
+                val newTimes = currentTimes + listOf(newTime)
+
+                // Atualiza a lista de tempos na base de dados
+                FirebaseHelpers.sendScore(newTimes) {
+                    Log.d(TAG, "Times updated successfully.")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error getting user document", e)
+            }
+    }*/
 }
 
 

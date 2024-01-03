@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".LeaderboardActivity">
+
+    <ListView
+        android:id="@+id/ListViewLeaderboard"
+        android:layout_width="729dp"
+        android:layout_height="409dp"
+        android:layout_marginTop="300dp"
+        android:background="#00000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.687" />
+
+    <TextView
+        android:id="@+id/textViewScoreLeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="303dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="303dp"
+        android:layout_marginBottom="27dp"
+        android:text="SCORE"
+        android:textColor="@android:color/holo_green_light"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toTopOf="@+id/ListViewLeaderboard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/imageButtonStartLeader"
+        android:layout_width="195dp"
+        android:layout_height="90dp"
+        android:layout_marginStart="62dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="46dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/ListViewLeaderboard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textViewScoreLeader"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/startbutton" />
+</androidx.constraintlayout.widget.ConstraintLayout>

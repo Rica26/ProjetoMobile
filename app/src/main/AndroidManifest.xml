@@ -13,9 +13,13 @@
         android:theme="@style/Theme.Projeto"
         tools:targetApi="31">
         <activity
-            android:name=".StartScreenActivity"
+            android:name=".LeaderboardActivity"
             android:screenOrientation="landscape"
             android:exported="false" />
+        <activity
+            android:name=".StartScreenActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".Victory"
             android:exported="false"

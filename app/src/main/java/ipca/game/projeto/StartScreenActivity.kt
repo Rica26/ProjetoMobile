@@ -13,5 +13,9 @@ class StartScreenActivity : AppCompatActivity() {
             val intent= Intent(this, GameActivity::class.java)
             startActivity(intent)
         }
+        findViewById<ImageButton>(R.id.imageButtonLeaderboard).setOnClickListener {
+            val intent=Intent(this,LeaderboardActivity::class.java)
+            startActivity(intent)
+        }
     }
 }

@@ -137,9 +137,6 @@ class Enemy {
             y -= directionY
 
         }
-        /*if(enemyType==EnemyType.SLIME){
-            player.speed=-1
-        }*/
 
         // Garante que o inimigo não ultrapasse os limites da tela
         x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
