@@ -62,18 +62,6 @@ class Buff {
 
     fun update(player: Player){
 
-
-        /*if(buffType==BuffType.ATTACK){
-            if(player.damage<150) {
-                player.damage += 10
-            }
-        }
-        else{
-            player.currentHP+=50
-            if(player.currentHP==player.maxHP){
-                player.maxHP=player.currentHP
-            }
-        }*/
         detectCollision.left = x.toInt()
         detectCollision.top = y.toInt()
         detectCollision.right = (x + bitmap.width).toInt()

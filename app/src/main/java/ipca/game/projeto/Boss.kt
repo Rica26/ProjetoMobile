@@ -41,7 +41,7 @@ class Boss {
         maxHP=500
         currentHP=maxHP
         damage=50
-        speed=5
+        speed=8
         bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.boss)
         maxY= height-bitmap.height
         maxX= width-bitmap.width
@@ -51,31 +51,25 @@ class Boss {
 
     fun update(player: Player) {
 
-            val deltaX = player.x - x
-            val deltaY = player.y - y
+        val deltaX = player.x - x
+        val deltaY = player.y - y
 
-            // Calcula a distância total entre o jogador e o inimigo
-            val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
+        val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
-            // Normaliza o vetor de direção para suavizar o movimento
-            directionX = if (distance > 0) deltaX / distance else 0f
-            directionY = if (distance > 0) deltaY / distance else 0f
 
-            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
-            x += directionX * speed
-            y += directionY * speed
+        directionX = if (distance > 0) deltaX / distance else 0f
+        directionY = if (distance > 0) deltaY / distance else 0f
 
-        // Garante que o inimigo não ultrapasse os limites da tela
-        //x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
-        //y = y.coerceIn(0f, maxY.toFloat() - bitmap.height)
+
+        x += directionX * speed
+        y += directionY * speed
+
         rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
 
         if(currentHP<=0){
             isDead=true
         }
 
-
-        // Atualiza o objeto de detecção de colisão
         detectCollision.left = x.toInt()
         detectCollision.top = y.toInt()
         detectCollision.right = (x + bitmap.width).toInt()

@@ -13,11 +13,11 @@ object FirebaseHelpers {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val userDocRef = db.collection("users").document(currentUser?.uid!!)
 
-        // Verifica se o documento já existe
+
         userDocRef.get()
             .addOnSuccessListener { documentSnapshot ->
                 if (documentSnapshot.exists()) {
-                    // O documento existe, atualiza o campo "times" usando um array
+
                     userDocRef
                         .update("times", FieldValue.arrayUnion(time))
                         .addOnSuccessListener {
@@ -29,7 +29,7 @@ object FirebaseHelpers {
                             callback(false)
                         }
                 } else {
-                    // O documento não existe, cria-o com o campo "times"
+
                     val userData = hashMapOf("times" to arrayListOf(time))
                     userDocRef
                         .set(userData)

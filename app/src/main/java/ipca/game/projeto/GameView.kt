@@ -401,7 +401,7 @@ class GameView:SurfaceView,Runnable {
                     )
                 }
             }
-            bulletHandler.postDelayed(this, 500)  // Dispara continuamente
+            bulletHandler.postDelayed(this, 500)
         }
     }
     @RequiresApi(Build.VERSION_CODES.Q)
