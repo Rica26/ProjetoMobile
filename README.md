@@ -179,7 +179,7 @@ fun drawHealthBar(canvas: Canvas, paint: Paint) {
         canvas.drawRect(barLeft, barTop, barRight, barBottom, paint)
     }
 ```
-prosseguindo temos a função _update_ que trata da lógica do jogador, recebendo um joystick como argumento, e trata do movimento do jogador(não o deixando sair das bordas da tela usando o coerceIn) de acordo com o _joystick_, da morte do jogador e da deteção de colisão.
+prosseguindo temos a função _update_ que trata da lógica do jogador, recebendo um joystick como argumento, e trata do movimento do jogador(não o deixando sair das bordas da tela usando o coerceIn) de acordo com o _joystick_, cálculo do angulo de rotação para uso posterior, da morte do jogador e da deteção de colisão.
 ```kotlin
     fun update(joystick: Joystick) {
 
@@ -518,4 +518,224 @@ por fim, tal como no _Player_, tem duas funções auxiliares uma para tratar da 
         return Pair(directionX, directionY)
     }
 ```
+
+**_Buff_**:
+Na classe _Buff_ também começamos por criar um enum, desta vez denominado BuffType que contém os dois tipos de _buff_, um que aumenta o ataque e outro que dá vida ao jogador
+```kotlin
+enum class BuffType{
+    ATTACK,
+    HP
+}
+```
+no construtor usa a mesma lógica que o inimigo recebendo um _BuffType_ como argumento e tendo em conta o tipo de buff vai ter alguns parâmetros diferentes
+```kotlin
+    constructor(context:Context,width:Int,height:Int,buffType: BuffType){
+        this.buffType=buffType
+        maxX=width
+        maxY=height
+        isConsumed=false
+        if(buffType==BuffType.ATTACK){
+            bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.sword)
+
+            x = (generator.nextInt(maxX - bitmap.width)).toFloat()
+
+            y = (generator.nextInt(maxY - bitmap.height)).toFloat()
+
+            detectCollision = Rect(x.toInt(), y.toInt(), bitmap.width, bitmap.height)
+        }
+        else{
+            bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.heart)
+            x = (generator.nextInt(maxX - bitmap.width)).toFloat()
+
+            y = (generator.nextInt(maxY - bitmap.height)).toFloat()
+
+            detectCollision = Rect(x.toInt(), y.toInt(), bitmap.width, bitmap.height)
+        }
+
+    }
+```
+temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica função _update_ que neste caso recebe um jogador para depois verificar a colisão entre o _buff_ e o jogador. A verdade é que tentamos implementar isto de uma forma mais coerente tendo em conta o resto do projeto, metendo no _update_ a aplicação do efeito e usando a deteção de colisão no _update_ da _GameView_ mas não estava a funcionar como o suposto por isso usei esta função auxiliar efun applyBuffEffect(player: Player){
+        if(buffType==BuffType.ATTACK){
+            player.damage += 10
+
+        }
+        else{
+            player.currentHP+=50
+            if(player.currentHP==player.maxHP){
+                player.maxHP=player.currentHP
+            }
+        }
+    }
+
+    fun update(player: Player){
+
+        detectCollision.left = x.toInt()
+        detectCollision.top = y.toInt()
+        detectCollision.right = (x + bitmap.width).toInt()
+        detectCollision.bottom = (y + bitmap.height).toInt()
+        if (Rect.intersects(player.detectCollision, detectCollision)) {
+            Log.d("Buff", "Player collided with buff")
+            isConsumed = true
+            applyBuffEffect(player)
+            Log.d("Buff", "Damage: ${player.damage}" +
+                    "HP: ${player.currentHP}")
+        }
+    }
+}fun applyBuffEffect(player: Player){
+        if(buffType==BuffType.ATTACK){
+            player.damage += 10
+
+        }
+        else{
+            player.currentHP+=50
+            if(player.currentHP==player.maxHP){
+                player.maxHP=player.currentHP
+            }
+        }
+    }
+
+    fun update(player: Player){
+
+        detectCollision.left = x.toInt()
+        detectCollision.top = y.toInt()
+        detectCollision.right = (x + bitmap.width).toInt()
+        detectCollision.bottom = (y + bitmap.height).toInt()
+        if (Rect.intersects(player.detectCollision, detectCollision)) {
+            Log.d("Buff", "Player collided with buff")
+            isConsumed = true
+            applyBuffEffect(player)
+            Log.d("Buff", "Damage: ${player.damage}" +
+                    "HP: ${player.currentHP}")
+        }
+    }
+} deteta-se a colisão no _update_ da classe _Buff_
+```kotlin
+fun applyBuffEffect(player: Player){
+        if(buffType==BuffType.ATTACK){
+            player.damage += 10
+
+        }
+        else{
+            player.currentHP+=50
+            if(player.currentHP==player.maxHP){
+                player.maxHP=player.currentHP
+            }
+        }
+    }
+
+    fun update(player: Player){
+
+        detectCollision.left = x.toInt()
+        detectCollision.top = y.toInt()
+        detectCollision.right = (x + bitmap.width).toInt()
+        detectCollision.bottom = (y + bitmap.height).toInt()
+        if (Rect.intersects(player.detectCollision, detectCollision)) {
+            Log.d("Buff", "Player collided with buff")
+            isConsumed = true
+            applyBuffEffect(player)
+            Log.d("Buff", "Damage: ${player.damage}" +
+                    "HP: ${player.currentHP}")
+        }
+    }
+}
+```
+
+**_Boss_**
+Esta classe trata especificamente do inimigo final que _spawna_ depois de certos requisitos serem correspondidos. É um inimigo maior e bem mais forte em geral, sendo que dois ataques são normalmente fatais.
+No construtor recebe os parâmetros normais e inicializa os atributos normais de outras classes, sendo até menos complexo que o inimigo visto que só há um tipo de _boss_
+```kotlin
+constructor(context: Context, width:Int, height:Int){
+        x=(width/2).toFloat()
+        y=(height/2).toFloat()
+        maxHP=500
+        currentHP=maxHP
+        damage=50
+        speed=8
+        bitmap=BitmapFactory.decodeResource(context.resources,R.drawable.boss)
+        maxY= height-bitmap.height
+        maxX= width-bitmap.width
+        detectCollision=Rect(x.toInt(),y.toInt(),bitmap.width,bitmap.height)
+
+    }
+```
+a função _update_ da classe também é idêntica à dos inimigos recebendo um argumento _Player_ mas sem diferentes comportamentos dependendo da forma de ataque do inimigo sendo, tal como o construtor, menos complexa
+
+```kotlin
+fun update(player: Player) {
+
+        val deltaX = player.x - x
+        val deltaY = player.y - y
+        
+        val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
+
+            
+        directionX = if (distance > 0) deltaX / distance else 0f
+        directionY = if (distance > 0) deltaY / distance else 0f
+
+            
+        x += directionX * speed
+        y += directionY * speed
+        
+        rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
+
+        if(currentHP<=0){
+            isDead=true
+        }
+        
+        detectCollision.left = x.toInt()
+        detectCollision.top = y.toInt()
+        detectCollision.right = (x + bitmap.width).toInt()
+        detectCollision.bottom = (y + bitmap.height).toInt()
+    }
+```
+por fim temos a função auxiliar que usa o _Matrix_ para "animar" o bitmap do _Boss_
+
+
+FirebaseHelpers:
+-
+// O documento não existe, cria-o com o campo "times"
+```kotlin
+fun sendScore(time: Long, callback: (Boolean) -> Unit) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userDocRef = db.collection("users").document(currentUser?.uid!!)
+
+        
+        userDocRef.get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    // O documento existe, atualiza o campo "times" usando um array
+                    userDocRef
+                        .update("times", FieldValue.arrayUnion(time))
+                        .addOnSuccessListener {
+                            Log.d(MainActivity.TAG, "Time added successfully.")
+                            callback(true)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(MainActivity.TAG, "Error updating document", e)
+                            callback(false)
+                        }
+                } else {
+                    
+                    val userData = hashMapOf("times" to arrayListOf(time))
+                    userDocRef
+                        .set(userData)
+                        .addOnSuccessListener {
+                            Log.d(MainActivity.TAG, "Document created successfully.")
+                            callback(true)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(MainActivity.TAG, "Error creating document", e)
+                            callback(false)
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(MainActivity.TAG, "Error checking document existence", e)
+                callback(false)
+            }
+    }
+```
+
+
+
     
