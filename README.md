@@ -810,7 +810,7 @@ por fim temos a função auxiliar que usa o _Matrix_ para "animar" o bitmap do _
 
 FirebaseHelpers:
 -
-// O documento não existe, cria-o com o campo "times"
+este companion object tem a função que trata de enviar o score para o campo "times" de cada user na FireStore do Firebase
 ```kotlin
 fun sendScore(time: Long, callback: (Boolean) -> Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
