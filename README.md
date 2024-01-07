@@ -667,7 +667,9 @@ no construtor usa a mesma lógica que o inimigo recebendo um _BuffType_ como arg
 
     }
 ```
-temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica função _update_ que neste caso recebe um jogador para depois verificar a colisão entre o _buff_ e o jogador. A verdade é que tentamos implementar isto de uma forma mais coerente tendo em conta o resto do projeto, metendo no _update_ a aplicação do efeito e usando a deteção de colisão no _update_ da _GameView_ mas não estava a funcionar como o suposto por isso usei esta função auxiliar efun applyBuffEffect(player: Player){
+temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica função _update_ que neste caso recebe um jogador para depois verificar a colisão entre o _buff_ e o jogador. A verdade é que tentamos implementar isto de uma forma mais coerente tendo em conta o resto do projeto, metendo no _update_ a aplicação do efeito e usando a deteção de colisão no _update_ da _GameView_ mas não estava a funcionar como o suposto por isso usei esta função auxiliar e
+```kotlin
+fun applyBuffEffect(player: Player){
         if(buffType==BuffType.ATTACK){
             player.damage += 10
 
@@ -721,7 +723,9 @@ temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica 
                     "HP: ${player.currentHP}")
         }
     }
-} deteta-se a colisão no _update_ da classe _Buff_
+}
+```
+deteta-se a colisão no _update_ da classe _Buff_
 ```kotlin
 fun applyBuffEffect(player: Player){
         if(buffType==BuffType.ATTACK){
