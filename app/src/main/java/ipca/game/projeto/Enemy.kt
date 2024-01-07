@@ -108,15 +108,9 @@ class Enemy {
         if(!isRanged) {
             val deltaX = player.x - x
             val deltaY = player.y - y
-
-            // Calcula a distância total entre o jogador e o inimigo
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
-
-            // Normaliza o vetor de direção para suavizar o movimento
             directionX = if (distance > 0) deltaX / distance else 0f
             directionY = if (distance > 0) deltaY / distance else 0f
-
-            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
             x += directionX * speed
             y += directionY * speed
         }
@@ -124,21 +118,13 @@ class Enemy {
         if(isRanged){
             val deltaX = player.x - x
             val deltaY = player.y - y
-
-            // Calcula a distância total entre o jogador e o inimigo
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
-
-            // Normaliza o vetor de direção para suavizar o movimento
             directionX = if (distance > 0) deltaX / distance else 0f
             directionY = if (distance > 0) deltaY / distance else 0f
-
-            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
             x -= directionX
             y -= directionY
 
         }
-
-        // Garante que o inimigo não ultrapasse os limites da tela
         x = x.coerceIn(0f, maxX.toFloat() - bitmap.width)
         y = y.coerceIn(0f, maxY.toFloat() - bitmap.height)
         rotationAngle = Math.toDegrees(atan2(directionY.toDouble(), directionX.toDouble())).toFloat()
@@ -146,9 +132,6 @@ class Enemy {
         if(currentHP<=0){
             isDead=true
         }
-
-
-        // Atualiza o objeto de detecção de colisão
         detectCollision.left = x.toInt()
         detectCollision.top = y.toInt()
         detectCollision.right = (x + bitmap.width).toInt()

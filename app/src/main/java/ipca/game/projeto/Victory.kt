@@ -24,11 +24,7 @@ class Victory : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener { mp->mp.release() }
         val finalTime = intent.getLongExtra("finalTime", 0)
         val textViewTime = findViewById<TextView>(R.id.textViewTime)
-
-        // Convertendo o tempo para segundos
         val seconds = finalTime / 1000
-
-        // Configurando o texto do TextView
         textViewTime.text = "Time: $seconds segundos"
 
         FirebaseHelpers.sendScore(seconds){

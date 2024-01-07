@@ -108,7 +108,6 @@ class GameView:SurfaceView,Runnable {
                     val buff=Buff(context,width,height, buffType)
                     buffs.add(buff)
                 }
-                Log.d("Buff", "Buff created. Type: $buffType, Position: ($x, $y)")
                 buffHandler.postDelayed(this,20000)
             }
         },20000)
@@ -211,7 +210,6 @@ class GameView:SurfaceView,Runnable {
             p.update()
             for (e in enemies) {
                 if (Rect.intersects(p.detectCollision, e.detectCollision)) {
-                    // A colisão ocorreu, destrua o projétil e o inimigo
                     p.isDestroyed = true
                     e.currentHP-=player.damage
                     val mediaPlayer = MediaPlayer.create(context, R.raw.enemygethit)
@@ -248,8 +246,6 @@ class GameView:SurfaceView,Runnable {
             }
         }
         if (!bossSpawned && enemyDead == 5) {
-            //backgroundMusic?.isLooping=false
-            //backgroundMusic?.release()
             backgroundMusic?.stop()
 
 
@@ -259,7 +255,7 @@ class GameView:SurfaceView,Runnable {
 
             bossList.add(boss)
             bossSpawned = true
-            enemies.clear()  // Limpe a lista de inimigos após spawnar o chefe
+            enemies.clear()
         }
 
 
@@ -366,12 +362,12 @@ class GameView:SurfaceView,Runnable {
                 canvas?.drawBitmap(b.bitmap,b.x,b.y,paint)
             }
 
-            paint.textSize = 50f  // Tamanho do texto aumentado para 30
-            paint.color = Color.BLACK  // Cor do texto
+            paint.textSize = 50f
+            paint.color = Color.BLACK
             val text = "Tempo: ${elapsedTime / 1000} segundos"
             val textWidth = paint.measureText(text)
-            val x = (width - textWidth) / 2  // Centralizando o texto horizontalmente
-            val y = 70f  // Posição vertical do texto
+            val x = (width - textWidth) / 2
+            val y = 70f
             canvas?.drawText(text, x, y, paint)
 
 

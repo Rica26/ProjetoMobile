@@ -67,11 +67,8 @@ class Buff {
         detectCollision.right = (x + bitmap.width).toInt()
         detectCollision.bottom = (y + bitmap.height).toInt()
         if (Rect.intersects(player.detectCollision, detectCollision)) {
-            Log.d("Buff", "Player collided with buff")
             isConsumed = true
             applyBuffEffect(player)
-            Log.d("Buff", "Damage: ${player.damage}" +
-                    "HP: ${player.currentHP}")
         }
     }
 }

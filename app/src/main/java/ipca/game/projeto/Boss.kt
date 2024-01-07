@@ -24,7 +24,6 @@ class Boss {
     val damageCooldown = 5000L
     var maxX=0
     var maxY=0
-
     lateinit var detectCollision: Rect
     var isDead=false
     var damage:Int

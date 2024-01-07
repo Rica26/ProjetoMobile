@@ -21,7 +21,6 @@ class Projectile {
 
     lateinit var detectCollision : Rect
     lateinit var player : Player
-    lateinit var  enemy:Enemy
 
     constructor(context:Context,width:Int,height:Int, player: Player,directionX:Float,directionY: Float){
         x=player.x

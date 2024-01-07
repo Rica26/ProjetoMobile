@@ -18,7 +18,6 @@ class Joystick( val centerX: Float, val centerY: Float, val baseRadius: Float, v
     var stickX: Float = centerX
     var stickY: Float = centerY
     var maxSpeed: Int = 20
-    var lastDirection:Pair<Float, Float> = Pair(0f,0f)
 
     init {
         paintBase.color = Color.GRAY
@@ -36,8 +35,6 @@ class Joystick( val centerX: Float, val centerY: Float, val baseRadius: Float, v
 
         val deltaX = newX - centerX
         val deltaY = newY - centerY
-
-        // Calcula a distância do stick ao centro
         val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
         if (distance > stickRadius) {
@@ -52,8 +49,6 @@ class Joystick( val centerX: Float, val centerY: Float, val baseRadius: Float, v
     }
     fun decreaseSpeed(amount: Int) {
         maxSpeed -= amount
-
-        // Certifique-se de que a velocidade não se torne negativa
         if (maxSpeed < 0) {
             maxSpeed = 0
         }

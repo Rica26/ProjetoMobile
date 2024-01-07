@@ -31,9 +31,6 @@ class Player {
     var speed=0
     var isWalking = false
     var isDead = false
-    //var lastShootTime = System.currentTimeMillis()
-    //val shootInterval = 1000L
-
     lateinit var detectCollision : Rect
     var rotationAngle = 0f
     constructor(context: Context,width: Int, height: Int,joystick: Joystick){
@@ -51,23 +48,18 @@ class Player {
     }
 
     fun drawHealthBar(canvas: Canvas, paint: Paint) {
-        // Lógica para desenhar a barra de HP em relação à posição do jogador
-        val barWidth = 100 // A largura da barra de HP (ajuste conforme necessário)
-        val barHeight = 20 // A altura da barra de HP (ajuste conforme necessário)
-        val barLeft = x - barWidth / 2 // Posição esquerda da barra de HP em relação ao jogador
-        val barTop = y - 30 // Posição superior da barra de HP acima do jogador
-        val barRight = barLeft + (barWidth * currentHP / maxHP) // Largura proporcional à saúde atual
-        val barBottom = barTop + barHeight // Posição inferior da barra de HP
-
-        // Ajusta a cor com base na saúde do jogador
+        val barWidth = 100
+        val barHeight = 20
+        val barLeft = x - barWidth / 2
+        val barTop = y - 30
+        val barRight = barLeft + (barWidth * currentHP / maxHP)
+        val barBottom = barTop + barHeight
         val healthColor = when {
-            currentHP > maxHP * 0.5 -> Color.rgb(0, 255, 0) // Amarelo
-            currentHP < maxHP * 0.25 -> Color.rgb(255, (255 * (currentHP / (maxHP * 0.5))).toInt(), 0) // Vermelho gradual
-            else -> Color.rgb(255, 255, 0) // Vermelho
+            currentHP > maxHP * 0.5 -> Color.rgb(0, 255, 0)
+            currentHP < maxHP * 0.25 -> Color.rgb(255, (255 * (currentHP / (maxHP * 0.5))).toInt(), 0)
+            else -> Color.rgb(255, 255, 0)
         }
         paint.color = healthColor
-
-        // Desenha a barra de HP
         canvas.drawRect(barLeft, barTop, barRight, barBottom, paint)
     }
 
