@@ -1,4 +1,4 @@
-Mini-_Archero_- Projeto para Desenvolvimento de Jogos para Plataformas Móveis by Ricardo Almeida, Manuel Pacheco e Gonçalo Graça
+Mini-_Archero_- Projeto para Desenvolvimento de Jogos para Plataformas Móveis by Ricardo Almeida n26344, Manuel Pacheco n23470 e Gonçalo Graça n21084
 =============================================
 
 Introdução
