@@ -63,7 +63,7 @@ class Player {
         canvas.drawRect(barLeft, barTop, barRight, barBottom, paint)
     }
 
-    fun update(joystick: Joystick) {
+    fun update() {
 
         if(isWalking) {
             val deltaX = joystick.stickX - joystick.centerX

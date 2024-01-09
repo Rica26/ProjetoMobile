@@ -149,7 +149,7 @@ class GameView:SurfaceView,Runnable {
         elapsedTime = System.currentTimeMillis() - startTime
 
         for (p in playerList) {
-            p.update(joystick)
+            p.update()
             if(p.isDead){
                 isPlaying=false
             }

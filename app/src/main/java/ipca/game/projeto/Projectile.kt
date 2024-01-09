@@ -14,25 +14,21 @@ class Projectile {
     var maxY=0
 
     var isDestroyed = false
-    var bWidth=0f
-    var bHeight=0f
+    var bWidth=20f
+    var bHeight=20f
     var directionX=0f
     var directionY=0f
 
     lateinit var detectCollision : Rect
-    lateinit var player : Player
 
     constructor(context:Context,width:Int,height:Int, player: Player,directionX:Float,directionY: Float){
         x=player.x
         y=player.y
-        this.player = player
         this.directionX=directionX
         this.directionY=directionY
         speed=50f
         maxX=width
         maxY=height
-        bWidth=20f
-        bHeight=20f
         detectCollision=Rect(x.toInt(),y.toInt(),bWidth.toInt(),bHeight.toInt())
     }
 
