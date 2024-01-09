@@ -584,14 +584,11 @@ no _update_, que recebe um player como argumento, já dividimos a lógica em o i
             val deltaX = player.x - x
             val deltaY = player.y - y
 
-            // Calcula a distância total entre o jogador e o inimigo
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
-            // Normaliza o vetor de direção para suavizar o movimento
             directionX = if (distance > 0) deltaX / distance else 0f
             directionY = if (distance > 0) deltaY / distance else 0f
 
-            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
             x -= directionX
             y -= directionY
 
@@ -1304,11 +1301,7 @@ class Victory : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener { mp->mp.release() }
         val finalTime = intent.getLongExtra("finalTime", 0)
         val textViewTime = findViewById<TextView>(R.id.textViewTime)
-
-        // Convertendo o tempo para segundos
         val seconds = finalTime / 1000
-
-        // Configurando o texto do TextView
         textViewTime.text = "Time: $seconds segundos"
 
         FirebaseHelpers.sendScore(seconds){
