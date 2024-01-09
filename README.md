@@ -1,4 +1,4 @@
-Mini-_Archero_- Projeto para Desenvolvimento de Jogos para Plataformas Móveis by Ricardo Almeida, Manuel Pacheco e Gonçalo Graça
+Mini-_Archero_- Projeto para Desenvolvimento de Jogos para Plataformas Móveis by Ricardo Almeida n26344, Manuel Pacheco n23470 e Gonçalo Graça n21084
 =============================================
 
 Introdução
@@ -584,14 +584,11 @@ no _update_, que recebe um player como argumento, já dividimos a lógica em o i
             val deltaX = player.x - x
             val deltaY = player.y - y
 
-            // Calcula a distância total entre o jogador e o inimigo
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
-            // Normaliza o vetor de direção para suavizar o movimento
             directionX = if (distance > 0) deltaX / distance else 0f
             directionY = if (distance > 0) deltaY / distance else 0f
 
-            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
             x -= directionX
             y -= directionY
 
@@ -667,7 +664,9 @@ no construtor usa a mesma lógica que o inimigo recebendo um _BuffType_ como arg
 
     }
 ```
-temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica função _update_ que neste caso recebe um jogador para depois verificar a colisão entre o _buff_ e o jogador. A verdade é que tentamos implementar isto de uma forma mais coerente tendo em conta o resto do projeto, metendo no _update_ a aplicação do efeito e usando a deteção de colisão no _update_ da _GameView_ mas não estava a funcionar como o suposto por isso usei esta função auxiliar efun applyBuffEffect(player: Player){
+temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica função _update_ que neste caso recebe um jogador para depois verificar a colisão entre o _buff_ e o jogador. A verdade é que tentamos implementar isto de uma forma mais coerente tendo em conta o resto do projeto, metendo no _update_ a aplicação do efeito e usando a deteção de colisão no _update_ da _GameView_ mas não estava a funcionar como o suposto por isso usei esta função auxiliar e
+```kotlin
+fun applyBuffEffect(player: Player){
         if(buffType==BuffType.ATTACK){
             player.damage += 10
 
@@ -721,7 +720,9 @@ temos uma função que aplica o efeito do _buff_ dependendo do tipo e a típica 
                     "HP: ${player.currentHP}")
         }
     }
-} deteta-se a colisão no _update_ da classe _Buff_
+}
+```
+deteta-se a colisão no _update_ da classe _Buff_
 ```kotlin
 fun applyBuffEffect(player: Player){
         if(buffType==BuffType.ATTACK){
@@ -806,7 +807,7 @@ por fim temos a função auxiliar que usa o _Matrix_ para "animar" o bitmap do _
 
 FirebaseHelpers:
 -
-// O documento não existe, cria-o com o campo "times"
+este companion object tem a função que trata de enviar o score para o campo "times" de cada user na FireStore do Firebase
 ```kotlin
 fun sendScore(time: Long, callback: (Boolean) -> Unit) {
         val currentUser = FirebaseAuth.getInstance().currentUser
@@ -1300,11 +1301,7 @@ class Victory : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener { mp->mp.release() }
         val finalTime = intent.getLongExtra("finalTime", 0)
         val textViewTime = findViewById<TextView>(R.id.textViewTime)
-
-        // Convertendo o tempo para segundos
         val seconds = finalTime / 1000
-
-        // Configurando o texto do TextView
         textViewTime.text = "Time: $seconds segundos"
 
         FirebaseHelpers.sendScore(seconds){
