@@ -229,7 +229,6 @@ class GameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_game)
         val display=windowManager.defaultDisplay
         val size=Point()
         display.getSize(size)
@@ -272,7 +271,6 @@ constructor(context: Context,width: Int, height: Int,joystick: Joystick){
 depois temos uma função que desenha a barra de vida do jogador, que recebe um Canvas e um Paint, em cima dele e segue-o para onde ele for, mudando de cor de acordo com a vida restante do player(verde,amarelo e vermelho)
 ```kotlin
 fun drawHealthBar(canvas: Canvas, paint: Paint) {
-        // Lógica para desenhar a barra de HP em relação à posição do jogador
         val barWidth = 100 // A largura da barra de HP (ajuste conforme necessário)
         val barHeight = 20 // A altura da barra de HP (ajuste conforme necessário)
         val barLeft = x - barWidth / 2 // Posição esquerda da barra de HP em relação ao jogador
@@ -280,7 +278,6 @@ fun drawHealthBar(canvas: Canvas, paint: Paint) {
         val barRight = barLeft + (barWidth * currentHP / maxHP) // Largura proporcional à saúde atual
         val barBottom = barTop + barHeight // Posição inferior da barra de HP
 
-        // Ajusta a cor com base na saúde do jogador
         val healthColor = when {
             currentHP > maxHP * 0.5 -> Color.rgb(0, 255, 0) // Amarelo
             currentHP < maxHP * 0.25 -> Color.rgb(255, (255 * (currentHP / (maxHP * 0.5))).toInt(), 0) // Vermelho gradual
@@ -294,7 +291,7 @@ fun drawHealthBar(canvas: Canvas, paint: Paint) {
 ```
 prosseguindo temos a função _update_ que trata da lógica do jogador, recebendo um joystick como argumento, e trata do movimento do jogador(não o deixando sair das bordas da tela usando o coerceIn) de acordo com o _joystick_, cálculo do angulo de rotação para uso posterior, da morte do jogador e da deteção de colisão.
 ```kotlin
-    fun update(joystick: Joystick) {
+    fun update() {
 
         if(isWalking) {
             val deltaX = joystick.stickX - joystick.centerX
@@ -429,7 +426,6 @@ _Projectile_:
 constructor(context:Context,width:Int,height:Int, player: Player,directionX:Float,directionY: Float){
         x=player.x
         y=player.y
-        this.player = player
         this.directionX=directionX
         this.directionY=directionY
         speed=50f
@@ -446,7 +442,6 @@ _ProjectileEnemy_:
   constructor(context: Context, width: Int, height: Int, enemy: Enemy, directionX: Float, directionY: Float){
         x=enemy.x
         y=enemy.y
-        this.enemy=enemy
         this.directionX=directionX
         this.directionY=directionY
         speed=5f
@@ -520,7 +515,6 @@ constructor(context:Context,width:Int,height:Int,enemyType: EnemyType){
             EnemyType.SKELETON -> {
                 maxX = width
                 maxY = height
-                speed = 5
                 damage = 10
                 maxHP = 30
                 isRanged=true
@@ -568,14 +562,14 @@ no _update_, que recebe um player como argumento, já dividimos a lógica em o i
             val deltaX = player.x - x
             val deltaY = player.y - y
 
-            // Calcula a distância total entre o jogador e o inimigo
+           
             val distance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
             // Normaliza o vetor de direção para suavizar o movimento
             directionX = if (distance > 0) deltaX / distance else 0f
             directionY = if (distance > 0) deltaY / distance else 0f
 
-            // Atualiza a posição do inimigo com base na direção normalizada e na velocidade
+
             x += directionX * speed
             y += directionY * speed
         }
@@ -1198,7 +1192,7 @@ fun draw() {
         }
     }
 ```
-depois temos uma variável que _spawna_ periodicamente os projéteis do jogador usando a mesma lógica do _spawnEnemyProjectile_ mas usando um handler em vez do tempo do sistema(e também sendo mais rápido). Mais uma vez esta não tinha sido a nossa implementação original mas um _bug_ na parte do movimento com o disparo dos projeteis obrigou-nos a esta mudança e no _spawnEnemyProjectile_ o handler tava a dar problemas por alguma razão daí termos uma implementação diferente.
+depois temos uma variável que _spawna_ periodicamente os projéteis do jogador usando a mesma lógica do _spawnEnemyProjectile_ mas usando um handler em vez do tempo do sistema(e também sendo mais rápido). Mais uma vez esta não tinha sido a nossa implementação original mas um _bug_ na parte do movimento com o disparo dos projeteis obrigou-nos a esta mudança. Tentamos implementar como no _spawnEnemyProjectile_ mas tava a dar problemas
 
 ```kotlin
 val shootRunnable = object : Runnable {
