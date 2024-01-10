@@ -10,7 +10,6 @@ class GameActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_game)
         val display=windowManager.defaultDisplay
         val size=Point()
         display.getSize(size)

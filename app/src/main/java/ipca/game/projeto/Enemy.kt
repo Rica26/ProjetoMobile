@@ -66,7 +66,6 @@ class Enemy {
             EnemyType.SKELETON -> {
                 maxX = width
                 maxY = height
-                speed = 5
                 damage = 10
                 maxHP = 30
                 isRanged=true
